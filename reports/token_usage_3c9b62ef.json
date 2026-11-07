@@ -1,0 +1,316 @@
+{
+  "conversation_id": "3c9b62ef-69d1-4792-8357-d5a878e48c05",
+  "transcript_path": "C:\\Users\\az\\.gemini\\antigravity\\brain\\3c9b62ef-69d1-4792-8357-d5a878e48c05\\.system_generated\\logs\\transcript.jsonl",
+  "model": "Gemini 4 Argon (Medium)",
+  "started_at": "2026-11-07T06:56:04Z",
+  "updated_at": "2026-11-07T07:07:51Z",
+  "totals": {
+    "llm_steps": 19,
+    "user_turns": 3,
+    "input_tokens": 135421,
+    "cache_read_tokens": 717177,
+    "total_prompt_tokens": 852598,
+    "output_tokens": 21488,
+    "total_tokens": 874086,
+    "cache_hit_rate_pct": 84.12,
+    "uncached_input_share_pct": 15.88,
+    "current_context_tokens": 68542,
+    "peak_context_tokens": 68542,
+    "avg_input_tokens_per_step": 7127,
+    "avg_cache_tokens_per_step": 37746,
+    "avg_output_tokens_per_step": 1131
+  },
+  "turns": [
+    {
+      "turn_index": 1,
+      "step_index": 0,
+      "created_at": "2026-11-07T06:56:04Z",
+      "user_prompt_preview": "create a skill to check token in, token out, token cache for a session",
+      "llm_steps": 15,
+      "input_tokens": 60732,
+      "cache_read_tokens": 520034,
+      "output_tokens": 20821,
+      "total_prompt_tokens": 580766,
+      "total_tokens": 601587,
+      "cache_hit_rate_pct": 89.54
+    },
+    {
+      "turn_index": 2,
+      "step_index": 41,
+      "created_at": "2026-11-07T07:05:33Z",
+      "user_prompt_preview": "install the session-tokens",
+      "llm_steps": 3,
+      "input_tokens": 72273,
+      "cache_read_tokens": 131017,
+      "output_tokens": 342,
+      "total_prompt_tokens": 203290,
+      "total_tokens": 203632,
+      "cache_hit_rate_pct": 64.45
+    },
+    {
+      "turn_index": 3,
+      "step_index": 47,
+      "created_at": "2026-11-07T07:07:39Z",
+      "user_prompt_preview": "/session-tokens",
+      "llm_steps": 1,
+      "input_tokens": 2416,
+      "cache_read_tokens": 66126,
+      "output_tokens": 325,
+      "total_prompt_tokens": 68542,
+      "total_tokens": 68867,
+      "cache_hit_rate_pct": 96.48
+    }
+  ],
+  "steps": [
+    {
+      "step_index": 1,
+      "created_at": "2026-11-07T06:56:04Z",
+      "input_tokens": 9656,
+      "cache_read_tokens": 0,
+      "prompt_context_tokens": 9656,
+      "output_tokens": 333,
+      "step_total_tokens": 9989,
+      "cache_hit_rate_pct": 0.0,
+      "tools": [
+        "read_file",
+        "run_command"
+      ]
+    },
+    {
+      "step_index": 4,
+      "created_at": "2026-11-07T06:56:20Z",
+      "input_tokens": 2179,
+      "cache_read_tokens": 9657,
+      "prompt_context_tokens": 11836,
+      "output_tokens": 222,
+      "step_total_tokens": 12058,
+      "cache_hit_rate_pct": 81.59,
+      "tools": [
+        "read_file",
+        "read_file"
+      ]
+    },
+    {
+      "step_index": 8,
+      "created_at": "2026-11-07T06:56:31Z",
+      "input_tokens": 6576,
+      "cache_read_tokens": 11837,
+      "prompt_context_tokens": 18413,
+      "output_tokens": 463,
+      "step_total_tokens": 18876,
+      "cache_hit_rate_pct": 64.29,
+      "tools": [
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file"
+      ]
+    },
+    {
+      "step_index": 14,
+      "created_at": "2026-11-07T06:56:41Z",
+      "input_tokens": 5866,
+      "cache_read_tokens": 18414,
+      "prompt_context_tokens": 24280,
+      "output_tokens": 402,
+      "step_total_tokens": 24682,
+      "cache_hit_rate_pct": 75.84,
+      "tools": [
+        "run_command"
+      ]
+    },
+    {
+      "step_index": 16,
+      "created_at": "2026-11-07T06:56:58Z",
+      "input_tokens": 2712,
+      "cache_read_tokens": 22231,
+      "prompt_context_tokens": 24943,
+      "output_tokens": 140,
+      "step_total_tokens": 25083,
+      "cache_hit_rate_pct": 89.13,
+      "tools": [
+        "read_file"
+      ]
+    },
+    {
+      "step_index": 19,
+      "created_at": "2026-11-07T06:57:07Z",
+      "input_tokens": 2783,
+      "cache_read_tokens": 24944,
+      "prompt_context_tokens": 27727,
+      "output_tokens": 603,
+      "step_total_tokens": 28330,
+      "cache_hit_rate_pct": 89.96,
+      "tools": [
+        "run_command"
+      ]
+    },
+    {
+      "step_index": 21,
+      "created_at": "2026-11-07T06:57:25Z",
+      "input_tokens": 2914,
+      "cache_read_tokens": 25678,
+      "prompt_context_tokens": 28592,
+      "output_tokens": 212,
+      "step_total_tokens": 28804,
+      "cache_hit_rate_pct": 89.81,
+      "tools": [
+        "read_file"
+      ]
+    },
+    {
+      "step_index": 24,
+      "created_at": "2026-11-07T06:57:34Z",
+      "input_tokens": 2485,
+      "cache_read_tokens": 28593,
+      "prompt_context_tokens": 31078,
+      "output_tokens": 729,
+      "step_total_tokens": 31807,
+      "cache_hit_rate_pct": 92.0,
+      "tools": [
+        "read_file"
+      ]
+    },
+    {
+      "step_index": 26,
+      "created_at": "2026-11-07T06:57:48Z",
+      "input_tokens": 2049,
+      "cache_read_tokens": 44676,
+      "prompt_context_tokens": 46725,
+      "output_tokens": 2286,
+      "step_total_tokens": 49011,
+      "cache_hit_rate_pct": 95.61,
+      "tools": [
+        "write_file"
+      ]
+    },
+    {
+      "step_index": 28,
+      "created_at": "2026-11-07T06:58:24Z",
+      "input_tokens": 2367,
+      "cache_read_tokens": 46726,
+      "prompt_context_tokens": 49093,
+      "output_tokens": 5770,
+      "step_total_tokens": 54863,
+      "cache_hit_rate_pct": 95.18,
+      "tools": [
+        "write_file"
+      ]
+    },
+    {
+      "step_index": 30,
+      "created_at": "2026-11-07T06:59:21Z",
+      "input_tokens": 5849,
+      "cache_read_tokens": 49094,
+      "prompt_context_tokens": 54943,
+      "output_tokens": 6513,
+      "step_total_tokens": 61456,
+      "cache_hit_rate_pct": 89.35,
+      "tools": [
+        "write_file"
+      ]
+    },
+    {
+      "step_index": 32,
+      "created_at": "2026-11-07T07:00:23Z",
+      "input_tokens": 6592,
+      "cache_read_tokens": 54944,
+      "prompt_context_tokens": 61536,
+      "output_tokens": 1041,
+      "step_total_tokens": 62577,
+      "cache_hit_rate_pct": 89.29,
+      "tools": [
+        "write_file"
+      ]
+    },
+    {
+      "step_index": 34,
+      "created_at": "2026-11-07T07:00:47Z",
+      "input_tokens": 3170,
+      "cache_read_tokens": 59487,
+      "prompt_context_tokens": 62657,
+      "output_tokens": 226,
+      "step_total_tokens": 62883,
+      "cache_hit_rate_pct": 94.94,
+      "tools": [
+        "run_command"
+      ]
+    },
+    {
+      "step_index": 36,
+      "created_at": "2026-11-07T07:01:00Z",
+      "input_tokens": 2536,
+      "cache_read_tokens": 60608,
+      "prompt_context_tokens": 63144,
+      "output_tokens": 943,
+      "step_total_tokens": 64087,
+      "cache_hit_rate_pct": 95.98,
+      "tools": [
+        "edit_file",
+        "edit_file"
+      ]
+    },
+    {
+      "step_index": 40,
+      "created_at": "2026-11-07T07:01:17Z",
+      "input_tokens": 2998,
+      "cache_read_tokens": 63145,
+      "prompt_context_tokens": 66143,
+      "output_tokens": 938,
+      "step_total_tokens": 67081,
+      "cache_hit_rate_pct": 95.47,
+      "tools": []
+    },
+    {
+      "step_index": 42,
+      "created_at": "2026-11-07T07:05:34Z",
+      "input_tokens": 67365,
+      "cache_read_tokens": 0,
+      "prompt_context_tokens": 67365,
+      "output_tokens": 124,
+      "step_total_tokens": 67489,
+      "cache_hit_rate_pct": 0.0,
+      "tools": [
+        "run_command"
+      ]
+    },
+    {
+      "step_index": 44,
+      "created_at": "2026-11-07T07:05:50Z",
+      "input_tokens": 2434,
+      "cache_read_tokens": 65316,
+      "prompt_context_tokens": 67750,
+      "output_tokens": 78,
+      "step_total_tokens": 67828,
+      "cache_hit_rate_pct": 96.41,
+      "tools": []
+    },
+    {
+      "step_index": 46,
+      "created_at": "2026-11-07T07:05:59Z",
+      "input_tokens": 2474,
+      "cache_read_tokens": 65701,
+      "prompt_context_tokens": 68175,
+      "output_tokens": 140,
+      "step_total_tokens": 68315,
+      "cache_hit_rate_pct": 96.37,
+      "tools": []
+    },
+    {
+      "step_index": 48,
+      "created_at": "2026-11-07T07:07:39Z",
+      "input_tokens": 2416,
+      "cache_read_tokens": 66126,
+      "prompt_context_tokens": 68542,
+      "output_tokens": 325,
+      "step_total_tokens": 68867,
+      "cache_hit_rate_pct": 96.48,
+      "tools": [
+        "read_file",
+        "run_command"
+      ]
+    }
+  ],
+  "subagents": []
+}

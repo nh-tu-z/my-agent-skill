@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Session 3c9b62ef — Session Token Usage Report</title>
+  <style>
+    :root {
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-muted: #f1f5f9;
+      --bg-elevated: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-subtle: #64748b;
+      --border-color: #e2e8f0;
+      --accent-blue: #2563eb;
+      --accent-blue-soft: rgba(37, 99, 235, 0.12);
+      --accent-emerald: #059669;
+      --accent-emerald-soft: rgba(5, 150, 105, 0.12);
+      --accent-purple: #7c3aed;
+      --accent-purple-soft: rgba(124, 58, 237, 0.12);
+      --accent-amber: #d97706;
+      --accent-amber-soft: rgba(217, 119, 6, 0.12);
+      --accent-rose: #e11d48;
+      --accent-rose-soft: rgba(225, 29, 72, 0.12);
+      --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    html.dark {
+      --bg-page: #0b0f19;
+      --bg-card: #111827;
+      --bg-muted: #1e293b;
+      --bg-elevated: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-subtle: #64748b;
+      --border-color: #1e293b;
+      --accent-blue: #60a5fa;
+      --accent-blue-soft: rgba(96, 165, 250, 0.15);
+      --accent-emerald: #34d399;
+      --accent-emerald-soft: rgba(52, 211, 153, 0.15);
+      --accent-purple: #a78bfa;
+      --accent-purple-soft: rgba(167, 139, 250, 0.15);
+      --accent-amber: #fbbf24;
+      --accent-amber-soft: rgba(251, 191, 36, 0.15);
+      --accent-rose: #fb7185;
+      --accent-rose-soft: rgba(251, 113, 133, 0.15);
+      --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .container { max-width: 1320px; margin: 0 auto; padding: 24px; }
+    .header-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .title-group h1 { margin: 0 0 6px 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+    .title-group p { margin: 0; color: var(--text-muted); font-size: 13px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+
+    .controls { display: flex; gap: 10px; align-items: center; }
+    .btn, .select-input {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .btn:hover, .select-input:hover { border-color: var(--accent-blue); }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 18px 20px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 20px;
+    }
+    .kpi-card { margin-bottom: 0; position: relative; overflow: hidden; }
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 4px;
+    }
+    .kpi-sub { font-size: 12px; color: var(--text-subtle); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .badge-blue { background: var(--accent-blue-soft); color: var(--accent-blue); }
+    .badge-emerald { background: var(--accent-emerald-soft); color: var(--accent-emerald); }
+    .badge-purple { background: var(--accent-purple-soft); color: var(--accent-purple); }
+    .badge-amber { background: var(--accent-amber-soft); color: var(--accent-amber); }
+    .badge-rose { background: var(--accent-rose-soft); color: var(--accent-rose); }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0 0 14px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .bar-chart-row {
+      display: grid;
+      grid-template-columns: 70px 1fr 165px;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+    .bar-track {
+      height: 18px;
+      background: var(--bg-muted);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+    }
+    .bar-seg-cache { background: var(--accent-emerald); height: 100%; }
+    .bar-seg-in { background: var(--accent-blue); height: 100%; }
+    .bar-seg-out { background: var(--accent-purple); height: 100%; }
+
+    .legend {
+      display: flex;
+      gap: 18px;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+    th {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      background: var(--bg-muted);
+    }
+    tr:hover td { background: rgba(148, 163, 184, 0.05); }
+    .num { text-align: right; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; }
+    .prompt-preview {
+      max-width: 420px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text-main);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-bar">
+      <div class="title-group">
+        <h1 id="page-title">Session Token Analytics</h1>
+        <p id="page-subtitle"></p>
+      </div>
+      <div class="controls">
+        <select id="session-selector" class="select-input" style="display:none;"></select>
+        <button class="btn" id="theme-toggle">Toggle Light/Dark</button>
+      </div>
+    </div>
+
+    <div id="kpi-container" class="kpi-grid"></div>
+
+    <div class="card">
+      <div class="section-title">
+        <span>Context Window &amp; Token Composition by LLM Step</span>
+        <span id="peak-badge" class="badge badge-amber"></span>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><span class="dot" style="background:var(--accent-emerald)"></span> Token Cache (<code>cache_read_tokens</code>)</div>
+        <div class="legend-item"><span class="dot" style="background:var(--accent-blue)"></span> Token In Uncached (<code>input_tokens</code>)</div>
+        <div class="legend-item"><span class="dot" style="background:var(--accent-purple)"></span> Token Out (<code>output_tokens</code>)</div>
+      </div>
+      <div id="chart-container"></div>
+    </div>
+
+    <div class="card" id="turns-card">
+      <div class="section-title">
+        <span>Per-Turn Breakdown (Grouped by User Request)</span>
+      </div>
+      <div class="table-wrap">
+        <table id="turns-table">
+          <thead>
+            <tr>
+              <th>Turn</th>
+              <th>User Request Preview</th>
+              <th class="num">LLM Steps</th>
+              <th class="num">Token In (Uncached)</th>
+              <th class="num">Token Cache (Read)</th>
+              <th class="num">Token Out</th>
+              <th class="num">Cache Hit %</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" id="subagents-card" style="display:none;">
+      <div class="section-title">
+        <span>Subagent Sessions Invoked</span>
+      </div>
+      <div class="table-wrap">
+        <table id="subagents-table">
+          <thead>
+            <tr>
+              <th>Subagent Conversation ID</th>
+              <th class="num">LLM Steps</th>
+              <th class="num">Token In</th>
+              <th class="num">Token Cache</th>
+              <th class="num">Token Out</th>
+              <th class="num">Cache Hit %</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">
+        <span>Detailed Step-by-Step LLM Call Log</span>
+      </div>
+      <div class="table-wrap">
+        <table id="steps-table">
+          <thead>
+            <tr>
+              <th>Step #</th>
+              <th>Timestamp (UTC)</th>
+              <th class="num">Token In (Uncached)</th>
+              <th class="num">Token Cache (Read)</th>
+              <th class="num">Prompt Context (In+Cache)</th>
+              <th class="num">Token Out</th>
+              <th class="num">Cache Hit %</th>
+              <th>Tools Invoked</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PAYLOAD = {
+  "conversation_id": "3c9b62ef-69d1-4792-8357-d5a878e48c05",
+  "transcript_path": "C:\\Users\\az\\.gemini\\antigravity\\brain\\3c9b62ef-69d1-4792-8357-d5a878e48c05\\.system_generated\\logs\\transcript.jsonl",
+  "model": "Gemini 4 Argon (Medium)",
+  "started_at": "2026-11-07T06:56:04Z",
+  "updated_at": "2026-11-07T07:07:51Z",
+  "totals": {
+    "llm_steps": 19,
+    "user_turns": 3,
+    "input_tokens": 135421,
+    "cache_read_tokens": 717177,
+    "total_prompt_tokens": 852598,
+    "output_tokens": 21488,
+    "total_tokens": 874086,
+    "cache_hit_rate_pct": 84.12,
+    "uncached_input_share_pct": 15.88,
+    "current_context_tokens": 68542,
+    "peak_context_tokens": 68542,
+    "avg_input_tokens_per_step": 7127,
+    "avg_cache_tokens_per_step": 37746,
+    "avg_output_tokens_per_step": 1131
+  },
+  "turns": [
+    {
+      "turn_index": 1,
+      "step_index": 0,
+      "created_at": "2026-11-07T06:56:04Z",
+      "user_prompt_preview": "create a skill to check token in, token out, token cache for a session",
+      "llm_steps": 15,
+      "input_tokens": 60732,
+      "cache_read_tokens": 520034,
+      "output_tokens": 20821,
+      "total_prompt_tokens": 580766,
+      "total_tokens": 601587,
+      "cache_hit_rate_pct": 89.54
+    },
+    {
+      "turn_index": 2,
+      "step_index": 41,
+      "created_at": "2026-11-07T07:05:33Z",
+      "user_prompt_preview": "install the session-tokens",
+      "llm_steps": 3,
+      "input_tokens": 72273,
+      "cache_read_tokens": 131017,
+      "output_tokens": 342,
+      "total_prompt_tokens": 203290,
+      "total_tokens": 203632,
+      "cache_hit_rate_pct": 64.45
+    },
+    {
+      "turn_index": 3,
+      "step_index": 47,
+      "created_at": "2026-11-07T07:07:39Z",
+      "user_prompt_preview": "/session-tokens",
+      "llm_steps": 1,
+      "input_tokens": 2416,
+      "cache_read_tokens": 66126,
+      "output_tokens": 325,
+      "total_prompt_tokens": 68542,
+      "total_tokens": 68867,
+      "cache_hit_rate_pct": 96.48
+    }
+  ],
+  "steps": [
+    {
+      "step_index": 1,
+      "created_at": "2026-11-07T06:56:04Z",
+      "input_tokens": 9656,
+      "cache_read_tokens": 0,
+      "prompt_context_tokens": 9656,
+      "output_tokens": 333,
+      "step_total_tokens": 9989,
+      "cache_hit_rate_pct": 0.0,
+      "tools": [
+        "read_file",
+        "run_command"
+      ]
+    },
+    {
+      "step_index": 4,
+      "created_at": "2026-11-07T06:56:20Z",
+      "input_tokens": 2179,
+      "cache_read_tokens": 9657,
+      "prompt_context_tokens": 11836,
+      "output_tokens": 222,
+      "step_total_tokens": 12058,
+      "cache_hit_rate_pct": 81.59,
+      "tools": [
+        "read_file",
+        "read_file"
+      ]
+    },
+    {
+      "step_index": 8,
+      "created_at": "2026-11-07T06:56:31Z",
+      "input_tokens": 6576,
+      "cache_read_tokens": 11837,
+      "prompt_context_tokens": 18413,
+      "output_tokens": 463,
+      "step_total_tokens": 18876,
+      "cache_hit_rate_pct": 64.29,
+      "tools": [
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file",
+        "read_file"
+      ]
+    },
+    {
+      "step_index": 14,
+      "created_at": "2026-11-07T06:56:41Z",
+      "input_tokens": 5866,
+      "cache_read_tokens": 18414,
+      "prompt_context_tokens": 24280,
+      "output_tokens": 402,
+      "step_total_tokens": 24682,
+      "cache_hit_rate_pct": 75.84,
+      "tools": [
+        "run_command"
+      ]
+    },
+    {
+      "step_index": 16,
+      "created_at": "2026-11-07T06:56:58Z",
+      "input_tokens": 2712,
+      "cache_read_tokens": 22231,
+      "prompt_context_tokens": 24943,
+      "output_tokens": 140,
+      "step_total_tokens": 25083,
+      "cache_hit_rate_pct": 89.13,
+      "tools": [
+        "read_file"
+      ]
+    },
+    {
+      "step_index": 19,
+      "created_at": "2026-11-07T06:57:07Z",
+      "input_tokens": 2783,
+      "cache_read_tokens": 24944,
+      "prompt_context_tokens": 27727,
+      "output_tokens": 603,
+      "step_total_tokens": 28330,
+      "cache_hit_rate_pct": 89.96,
+      "tools": [
+        "run_command"
+      ]
+    },
+    {
+      "step_index": 21,
+      "created_at": "2026-11-07T06:57:25Z",
+      "input_tokens": 2914,
+      "cache_read_tokens": 25678,
+      "prompt_context_tokens": 28592,
+      "output_tokens": 212,
+      "step_total_tokens": 28804,
+      "cache_hit_rate_pct": 89.81,
+      "tools": [
+        "read_file"
+      ]
+    },
+    {
+      "step_index": 24,
+      "created_at": "2026-11-07T06:57:34Z",
+      "input_tokens": 2485,
+      "cache_read_tokens": 28593,
+      "prompt_context_tokens": 31078,
+      "output_tokens": 729,
+      "step_total_tokens": 31807,
+      "cache_hit_rate_pct": 92.0,
+      "tools": [
+        "read_file"
+      ]
+    },
+    {
+      "step_index": 26,
+      "created_at": "2026-11-07T06:57:48Z",
+      "input_tokens": 2049,
+      "cache_read_tokens": 44676,
+      "prompt_context_tokens": 46725,
+      "output_tokens": 2286,
+      "step_total_tokens": 49011,
+      "cache_hit_rate_pct": 95.61,
+      "tools": [
+        "write_file"
+      ]
+    },
+    {
+      "step_index": 28,
+      "created_at": "2026-11-07T06:58:24Z",
+      "input_tokens": 2367,
+      "cache_read_tokens": 46726,
+      "prompt_context_tokens": 49093,
+      "output_tokens": 5770,
+      "step_total_tokens": 54863,
+      "cache_hit_rate_pct": 95.18,
+      "tools": [
+        "write_file"
+      ]
+    },
+    {
+      "step_index": 30,
+      "created_at": "2026-11-07T06:59:21Z",
+      "input_tokens": 5849,
+      "cache_read_tokens": 49094,
+      "prompt_context_tokens": 54943,
+      "output_tokens": 6513,
+      "step_total_tokens": 61456,
+      "cache_hit_rate_pct": 89.35,
+      "tools": [
+        "write_file"
+      ]
+    },
+    {
+      "step_index": 32,
+      "created_at": "2026-11-07T07:00:23Z",
+      "input_tokens": 6592,
+      "cache_read_tokens": 54944,
+      "prompt_context_tokens": 61536,
+      "output_tokens": 1041,
+      "step_total_tokens": 62577,
+      "cache_hit_rate_pct": 89.29,
+      "tools": [
+        "write_file"
+      ]
+    },
+    {
+      "step_index": 34,
+      "created_at": "2026-11-07T07:00:47Z",
+      "input_tokens": 3170,
+      "cache_read_tokens": 59487,
+      "prompt_context_tokens": 62657,
+      "output_tokens": 226,
+      "step_total_tokens": 62883,
+      "cache_hit_rate_pct": 94.94,
+      "tools": [
+        "run_command"
+      ]
+    },
+    {
+      "step_index": 36,
+      "created_at": "2026-11-07T07:01:00Z",
+      "input_tokens": 2536,
+      "cache_read_tokens": 60608,
+      "prompt_context_tokens": 63144,
+      "output_tokens": 943,
+      "step_total_tokens": 64087,
+      "cache_hit_rate_pct": 95.98,
+      "tools": [
+        "edit_file",
+        "edit_file"
+      ]
+    },
+    {
+      "step_index": 40,
+      "created_at": "2026-11-07T07:01:17Z",
+      "input_tokens": 2998,
+      "cache_read_tokens": 63145,
+      "prompt_context_tokens": 66143,
+      "output_tokens": 938,
+      "step_total_tokens": 67081,
+      "cache_hit_rate_pct": 95.47,
+      "tools": []
+    },
+    {
+      "step_index": 42,
+      "created_at": "2026-11-07T07:05:34Z",
+      "input_tokens": 67365,
+      "cache_read_tokens": 0,
+      "prompt_context_tokens": 67365,
+      "output_tokens": 124,
+      "step_total_tokens": 67489,
+      "cache_hit_rate_pct": 0.0,
+      "tools": [
+        "run_command"
+      ]
+    },
+    {
+      "step_index": 44,
+      "created_at": "2026-11-07T07:05:50Z",
+      "input_tokens": 2434,
+      "cache_read_tokens": 65316,
+      "prompt_context_tokens": 67750,
+      "output_tokens": 78,
+      "step_total_tokens": 67828,
+      "cache_hit_rate_pct": 96.41,
+      "tools": []
+    },
+    {
+      "step_index": 46,
+      "created_at": "2026-11-07T07:05:59Z",
+      "input_tokens": 2474,
+      "cache_read_tokens": 65701,
+      "prompt_context_tokens": 68175,
+      "output_tokens": 140,
+      "step_total_tokens": 68315,
+      "cache_hit_rate_pct": 96.37,
+      "tools": []
+    },
+    {
+      "step_index": 48,
+      "created_at": "2026-11-07T07:07:39Z",
+      "input_tokens": 2416,
+      "cache_read_tokens": 66126,
+      "prompt_context_tokens": 68542,
+      "output_tokens": 325,
+      "step_total_tokens": 68867,
+      "cache_hit_rate_pct": 96.48,
+      "tools": [
+        "read_file",
+        "run_command"
+      ]
+    }
+  ],
+  "subagents": []
+};
+    const sessions = Array.isArray(PAYLOAD.sessions) ? PAYLOAD.sessions : [PAYLOAD];
+
+    const fmt = (n) => Number(n || 0).toLocaleString();
+    const fmtPct = (n) => Number(n || 0).toFixed(1) + '%';
+
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+    });
+
+    const selector = document.getElementById('session-selector');
+    if (sessions.length > 1) {
+      selector.style.display = 'inline-block';
+      sessions.forEach((s, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = `${s.conversation_id.slice(0, 8)}... (${fmt(s.totals.total_tokens)} tokens)`;
+        selector.appendChild(opt);
+      });
+      selector.addEventListener('change', (e) => renderSession(sessions[Number(e.target.value)]));
+    }
+
+    function renderSession(s) {
+      const t = s.totals || {};
+      document.getElementById('page-title').textContent = `Session Token Usage — ${s.conversation_id}`;
+      document.getElementById('page-subtitle').textContent =
+        `Model: ${s.model || 'Default'} | Started: ${s.started_at || 'N/A'} | Updated: ${s.updated_at || 'N/A'} | LLM Steps: ${t.llm_steps || 0}`;
+
+      const kpis = [
+        {
+          label: 'Token In (Uncached)',
+          value: fmt(t.input_tokens),
+          sub: `${fmtPct(t.uncached_input_share_pct || (100 - (t.cache_hit_rate_pct || 0)))} of total prompt context`,
+          badge: 'input_tokens',
+          badgeClass: 'badge-blue'
+        },
+        {
+          label: 'Token Cache (Read)',
+          value: fmt(t.cache_read_tokens),
+          sub: `Cache Hit Rate: ${fmtPct(t.cache_hit_rate_pct)}`,
+          badge: 'cache_read_tokens',
+          badgeClass: 'badge-emerald'
+        },
+        {
+          label: 'Token Out (Generated)',
+          value: fmt(t.output_tokens),
+          sub: `Avg ${fmt(t.avg_output_tokens_per_step)} tokens / step`,
+          badge: 'output_tokens',
+          badgeClass: 'badge-purple'
+        },
+        {
+          label: 'Total Prompt Context',
+          value: fmt(t.total_prompt_tokens),
+          sub: `Sum of Token In + Token Cache`,
+          badge: 'In + Cache',
+          badgeClass: 'badge-amber'
+        },
+        {
+          label: 'Current / Peak Context',
+          value: `${fmt(t.current_context_tokens)} / ${fmt(t.peak_context_tokens)}`,
+          sub: `Latest step vs. Max step window`,
+          badge: 'Window',
+          badgeClass: 'badge-rose'
+        }
+      ];
+
+      const kpiContainer = document.getElementById('kpi-container');
+      kpiContainer.innerHTML = kpis.map(k => `
+        <div class="card kpi-card">
+          <div class="kpi-label">
+            <span>${k.label}</span>
+            <span class="badge ${k.badgeClass}">${k.badge}</span>
+          </div>
+          <div class="kpi-value">${k.value}</div>
+          <div class="kpi-sub">${k.sub}</div>
+        </div>
+      `).join('');
+
+      document.getElementById('peak-badge').textContent = `Peak Window: ${fmt(t.peak_context_tokens)} tokens`;
+
+      // Render step bar chart
+      const steps = s.steps || [];
+      const maxStepTotal = Math.max(1, ...steps.map(st => st.step_total_tokens || 1));
+      const chartContainer = document.getElementById('chart-container');
+      if (steps.length === 0) {
+        chartContainer.innerHTML = `<div style="color:var(--text-muted)">No PLANNER_RESPONSE steps recorded yet.</div>`;
+      } else {
+        chartContainer.innerHTML = steps.map(st => {
+          const cacheW = ((st.cache_read_tokens / maxStepTotal) * 100).toFixed(2);
+          const inW = ((st.input_tokens / maxStepTotal) * 100).toFixed(2);
+          const outW = ((st.output_tokens / maxStepTotal) * 100).toFixed(2);
+          return `
+            <div class="bar-chart-row" title="Step #${st.step_index}: In=${fmt(st.input_tokens)}, Cache=${fmt(st.cache_read_tokens)}, Out=${fmt(st.output_tokens)}">
+              <div class="mono">Step #${st.step_index}</div>
+              <div class="bar-track">
+                <div class="bar-seg-cache" style="width:${cacheW}%"></div>
+                <div class="bar-seg-in" style="width:${inW}%"></div>
+                <div class="bar-seg-out" style="width:${outW}%"></div>
+              </div>
+              <div class="num mono">${fmt(st.prompt_context_tokens)} ctx | ${fmtPct(st.cache_hit_rate_pct)}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Render turns table
+      const turnsBody = document.querySelector('#turns-table tbody');
+      const turns = s.turns || [];
+      turnsBody.innerHTML = turns.map(tr => `
+        <tr>
+          <td class="mono">Turn #${tr.turn_index}</td>
+          <td><div class="prompt-preview" title="${(tr.user_prompt_preview || '').replace(/"/g, '&quot;')}">${tr.user_prompt_preview || '(System / Continuation)'}</div></td>
+          <td class="num">${tr.llm_steps}</td>
+          <td class="num">${fmt(tr.input_tokens)}</td>
+          <td class="num">${fmt(tr.cache_read_tokens)}</td>
+          <td class="num">${fmt(tr.output_tokens)}</td>
+          <td class="num"><span class="badge badge-emerald">${fmtPct(tr.cache_hit_rate_pct)}</span></td>
+        </tr>
+      `).join('');
+
+      // Subagents table
+      const subCard = document.getElementById('subagents-card');
+      const subs = s.subagents || [];
+      if (subs.length > 0) {
+        subCard.style.display = 'block';
+        document.querySelector('#subagents-table tbody').innerHTML = subs.map(sub => `
+          <tr>
+            <td class="mono">${sub.conversation_id}</td>
+            <td class="num">${sub.totals.llm_steps}</td>
+            <td class="num">${fmt(sub.totals.input_tokens)}</td>
+            <td class="num">${fmt(sub.totals.cache_read_tokens)}</td>
+            <td class="num">${fmt(sub.totals.output_tokens)}</td>
+            <td class="num"><span class="badge badge-emerald">${fmtPct(sub.totals.cache_hit_rate_pct)}</span></td>
+          </tr>
+        `).join('');
+      } else {
+        subCard.style.display = 'none';
+      }
+
+      // Steps table
+      const stepsBody = document.querySelector('#steps-table tbody');
+      stepsBody.innerHTML = steps.map(st => `
+        <tr>
+          <td class="mono">#${st.step_index}</td>
+          <td class="mono">${st.created_at || ''}</td>
+          <td class="num">${fmt(st.input_tokens)}</td>
+          <td class="num">${fmt(st.cache_read_tokens)}</td>
+          <td class="num"><strong>${fmt(st.prompt_context_tokens)}</strong></td>
+          <td class="num">${fmt(st.output_tokens)}</td>
+          <td class="num"><span class="badge ${st.cache_hit_rate_pct >= 70 ? 'badge-emerald' : st.cache_hit_rate_pct >= 30 ? 'badge-amber' : 'badge-blue'}">${fmtPct(st.cache_hit_rate_pct)}</span></td>
+          <td>${(st.tools || []).map(tl => `<span class="badge badge-purple" style="margin-right:4px;">${tl}</span>`).join('') || '<span style="color:var(--text-subtle)">—</span>'}</td>
+        </tr>
+      `).join('');
+    }
+
+    if (sessions.length > 0) {
+      renderSession(sessions[0]);
+    }
+  </script>
+</body>
+</html>
+
