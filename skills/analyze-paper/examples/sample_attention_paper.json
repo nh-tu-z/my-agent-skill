@@ -1,0 +1,240 @@
+{
+  "metadata": {
+    "title": "Attention Is All You Need",
+    "authors": [
+      "Ashish Vaswani",
+      "Noam Shazeer",
+      "Niki Parmar",
+      "Jakob Uszkoreit",
+      "Llion Jones",
+      "Aidan N. Gomez",
+      "Łukasz Kaiser",
+      "Illia Polosukhin"
+    ],
+    "affiliations": ["Google Brain", "Google Research", "University of Toronto"],
+    "year": "2017",
+    "venue": "NeurIPS 2017",
+    "source_url_or_path": "https://arxiv.org/abs/1706.03762",
+    "code_url": "https://github.com/tensorflow/tensor2tensor",
+    "domain_tags": ["Natural Language Processing", "Sequence Modeling", "Deep Learning Architecture"],
+    "tldr": "Proposes the Transformer, a sequence transduction architecture based solely on self-attention mechanisms, dispensing entirely with recurrence and convolutions. It achieves state-of-the-art translation quality on WMT 2014 English-to-German and English-to-French while requiring significantly less training compute through high parallelizability.",
+    "reproducibility": {
+      "code_available": true,
+      "public_datasets": true,
+      "hyperparameters_specified": true,
+      "compute_specified": "8x NVIDIA P100 GPUs (12 hours for base model, 3.5 days for big model)",
+      "reproducibility_tier": "High"
+    }
+  },
+  "problem": {
+    "broad_domain": "Natural Language Processing (NLP)",
+    "specific_task": "Neural Machine Translation (Sequence-to-Sequence Transduction & Constituency Parsing)",
+    "problem_type_badges": [
+      "Efficiency / Latency / Memory",
+      "Accuracy / SOTA Push",
+      "Core Architecture Redesign"
+    ],
+    "problem_statement": "How can we design a sequence transduction model that captures long-range dependencies effectively while eliminating the sequential computation bottleneck of Recurrent Neural Networks (RNNs/LSTMs) and CNNs?",
+    "research_questions": [
+      "Can self-attention alone replace recurrence and convolution in encoder-decoder sequence transduction?",
+      "Does constant O(1) sequential path length improve long-range dependency modeling and training throughput?"
+    ],
+    "prior_bottlenecks": [
+      "Recurrent models (LSTM, GRU) process tokens sequentially (h_t as a function of h_{t-1}), precluding parallelization within training examples.",
+      "Convolutional sequence models (ByteNet, ConvS2S) require O(log_k(n)) or O(n/k) layers to connect distant positions, making long-range dependency learning harder."
+    ],
+    "key_contributions": [
+      "Introduces the Transformer architecture relying entirely on stacked Multi-Head Self-Attention and point-wise feed-forward layers.",
+      "Reduces maximum path length between any two input/output positions to O(1) operations.",
+      "Establishes new SOTA BLEU scores on WMT 2014 En-De (28.4) and En-Fr (41.8) at a fraction of prior training cost."
+    ],
+    "evidence_location": "Abstract, Section 1 & Section 2, pp. 1-2"
+  },
+  "methods": {
+    "primary_paradigm": "Transformer / Multi-Head Self-Attention Architecture",
+    "method_badges": [
+      "Self-Attention",
+      "Encoder-Decoder",
+      "Parallel Training",
+      "Sinusoidal Positional Encoding"
+    ],
+    "method_summary": "An encoder-decoder architecture where the encoder maps an input sequence of symbol representations to continuous representations using 6 identical layers of Multi-Head Self-Attention and position-wise FFN, and the decoder generates an output sequence auto-regressively using masked self-attention and encoder-decoder cross-attention.",
+    "proposed_components": [
+      {
+        "name": "Scaled Dot-Product Attention",
+        "category": "Core Architecture / Model Design",
+        "is_novel": true,
+        "role": "Computes weighted representation of values V based on compatibility of queries Q and keys K.",
+        "mechanism": "Computes Attention(Q, K, V) = softmax((QK^T) / sqrt(d_k))V. Scaling by 1/sqrt(d_k) prevents large dot products from pushing softmax into regions with vanishingly small gradients.",
+        "evidence_location": "Section 3.2.1, Eq. 1, Fig. 2 (left), p. 4"
+      },
+      {
+        "name": "Multi-Head Attention (MHA)",
+        "category": "Core Architecture / Model Design",
+        "is_novel": true,
+        "role": "Allows the model to jointly attend to information from different representation subspaces at different positions.",
+        "mechanism": "Projects Q, K, V h=8 times with learned linear projections to d_k=d_v=64 dimensions, applies Scaled Dot-Product Attention in parallel, concatenates outputs, and projects with W^O.",
+        "evidence_location": "Section 3.2.2, Fig. 2 (right), pp. 4-5"
+      },
+      {
+        "name": "Sinusoidal Positional Encoding",
+        "category": "Core Architecture / Model Design",
+        "is_novel": true,
+        "role": "Injects information about relative and absolute token positions since the model contains no recurrence or convolution.",
+        "mechanism": "Adds sine and cosine functions of different frequencies PE_{(pos, 2i)} = sin(pos / 10000^{2i/d_model}) to the input embeddings.",
+        "evidence_location": "Section 3.5, p. 6"
+      },
+      {
+        "name": "Warmup Inverse-Square-Root Learning Rate Schedule + Label Smoothing",
+        "category": "Training / Optimization Strategy",
+        "is_novel": false,
+        "role": "Stabilizes Adam optimizer training and prevents overconfidence during sequence generation.",
+        "mechanism": "Increases learning rate linearly for warmup_steps=4000, then decays proportionally to step_num^{-0.5}; applies label smoothing epsilon_ls=0.1.",
+        "evidence_location": "Section 5.3 & Section 5.4, pp. 7-8"
+      }
+    ],
+    "baselines_compared": [
+      "ByteNet (Kalchbrenner et al., 2016)",
+      "GNMT + RL (Wu et al., 2016)",
+      "ConvS2S (Gehring et al., 2017)",
+      "MoE (Shazeer et al., 2017)",
+      "Deep-Att + PosUnk (Zhou et al., 2016)"
+    ],
+    "pipeline_steps": [
+      {
+        "step_number": 1,
+        "stage_name": "Tokenization & Positional Embedding",
+        "description": "Tokenize source/target sentences via BPE/word-piece into d_model=512 embeddings and sum with sinusoidal positional encodings."
+      },
+      {
+        "step_number": 2,
+        "stage_name": "N=6 Encoder Stack",
+        "description": "Pass representations through 6 layers of Multi-Head Self-Attention + Residual/LayerNorm + Position-wise FFN (d_ff=2048)."
+      },
+      {
+        "step_number": 3,
+        "stage_name": "N=6 Masked Decoder Stack",
+        "description": "Apply masked self-attention over previous target tokens, cross-attention over encoder output, and position-wise FFN."
+      },
+      {
+        "step_number": 4,
+        "stage_name": "Linear Projection & Beam Search Decoding",
+        "description": "Project decoder output to vocabulary logits via shared weight matrix and decode with beam size=4, length penalty alpha=0.6."
+      }
+    ]
+  },
+  "datasets": [
+    {
+      "name": "WMT 2014 English-to-German (En-De)",
+      "modality": "Text / Natural Language",
+      "usage_role": "Fine-tuning / Training",
+      "scale_and_splits": "~4.5 million sentence pairs; encoded with Byte-Pair Encoding (BPE) shared 37,000 token vocabulary; tested on newstest2014.",
+      "domain": "Machine Translation (News / Parliamentary Text)",
+      "availability": "Public / Open",
+      "preprocessing_or_notes": "Shared source-target BPE vocabulary of 37k tokens; batched by approximate sequence length (~25,000 source + 25,000 target tokens per batch).",
+      "evidence_location": "Section 5.1, p. 7"
+    },
+    {
+      "name": "WMT 2014 English-to-French (En-Fr)",
+      "modality": "Text / Natural Language",
+      "usage_role": "Fine-tuning / Training",
+      "scale_and_splits": "36 million sentence pairs; 32,000 word-piece vocabulary; tested on newstest2014.",
+      "domain": "Machine Translation",
+      "availability": "Public / Open",
+      "preprocessing_or_notes": "Split tokens into 32,000 word-piece vocabulary.",
+      "evidence_location": "Section 5.1, p. 7"
+    },
+    {
+      "name": "Penn Treebank (WSJ Section)",
+      "modality": "Text / Natural Language",
+      "usage_role": "Zero-Shot / OOD Evaluation",
+      "scale_and_splits": "40K training sentences (WSJ only) and 17M sentences in semi-supervised setting (BerkleyParser corpora).",
+      "domain": "English Constituency Parsing",
+      "availability": "Restricted / Credentialed",
+      "preprocessing_or_notes": "Used to test whether the Transformer generalizes beyond translation to structural syntactic tasks.",
+      "evidence_location": "Section 6.3, Table 4, pp. 9-10"
+    }
+  ],
+  "metrics": [
+    {
+      "name": "BLEU (Bilingual Evaluation Understudy)",
+      "category": "Task Accuracy / Quality",
+      "direction": "Higher is better (↑)",
+      "purpose": "Measures n-gram precision overlap between generated machine translation output and human reference translations.",
+      "is_primary": true,
+      "evidence_location": "Section 6.1, Table 2, p. 8"
+    },
+    {
+      "name": "Training Cost (FLOPs)",
+      "category": "Efficiency / Compute / Memory",
+      "direction": "Lower is better (↓)",
+      "purpose": "Estimated total floating-point operations required to train the model (training time × number of GPUs × single-precision FLOP capacity).",
+      "is_primary": true,
+      "evidence_location": "Section 6.1, Table 2, p. 8"
+    },
+    {
+      "name": "Perplexity (PPL)",
+      "category": "Error / Distance",
+      "direction": "Lower is better (↓)",
+      "purpose": "Evaluates token-level language/translation modeling uncertainty on the development set (newstest2013) during ablations.",
+      "is_primary": false,
+      "evidence_location": "Section 6.2, Table 3, p. 9"
+    },
+    {
+      "name": "Section 23 F1 Score (EVALB)",
+      "category": "Task Accuracy / Quality",
+      "direction": "Higher is better (↑)",
+      "purpose": "Measures precision and recall of labeled syntactic constituents on WSJ Section 23.",
+      "is_primary": false,
+      "evidence_location": "Section 6.3, Table 4, p. 10"
+    }
+  ],
+  "experimental_results": [
+    {
+      "dataset": "WMT 2014 English-to-German (newstest2014)",
+      "metric": "BLEU",
+      "proposed_method_name": "Transformer (big)",
+      "proposed_score": "28.4",
+      "best_baseline_name": "ConvS2S Ensemble (Gehring et al., 2017)",
+      "best_baseline_score": "26.36",
+      "delta_or_improvement": "+2.04 BLEU (at ~1/40th ensemble training FLOPs)",
+      "evidence_location": "Table 2, p. 8"
+    },
+    {
+      "dataset": "WMT 2014 English-to-French (newstest2014)",
+      "metric": "BLEU",
+      "proposed_method_name": "Transformer (big)",
+      "proposed_score": "41.8",
+      "best_baseline_name": "ConvS2S (single model)",
+      "best_baseline_score": "40.46",
+      "delta_or_improvement": "+1.34 BLEU (3.5× lower training cost)",
+      "evidence_location": "Table 2, p. 8"
+    },
+    {
+      "dataset": "WSJ Constituency Parsing (Semi-Supervised)",
+      "metric": "Section 23 F1",
+      "proposed_method_name": "Transformer (4-layer)",
+      "proposed_score": "92.7",
+      "best_baseline_name": "Petrov et al. (2006) / McClosky et al. (2006)",
+      "best_baseline_score": "92.1",
+      "delta_or_improvement": "+0.6 F1",
+      "evidence_location": "Table 4, p. 10"
+    }
+  ],
+  "critical_review": {
+    "strengths": [
+      "Fundamental paradigm shift: demonstrates that self-attention alone outperforms both RNNs and CNNs on sequence transduction.",
+      "Dramatic training efficiency gains due to full parallelization across sequence positions during training.",
+      "Thorough ablation study (Table 3) isolating the impact of head count h, key dimension d_k, model size, dropout, and sinusoidal vs. learned positional embeddings."
+    ],
+    "limitations": [
+      "Quadratic O(n^2 · d) complexity per layer with respect to sequence length n, which becomes a memory/compute bottleneck for very long sequences (images, audio, video).",
+      "Autoregressive decoding during inference remains sequential O(n) steps."
+    ],
+    "future_directions": [
+      "Restricting self-attention to local neighborhoods of size r around the output position to reduce complexity to O(r · n · d) for long sequences.",
+      "Extending the Transformer architecture to multimodal inputs (images, audio, video) and less sequential generation."
+    ]
+  }
+}
+

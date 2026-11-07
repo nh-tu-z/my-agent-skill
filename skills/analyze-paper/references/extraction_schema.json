@@ -1,0 +1,236 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AcademicPaperAnalysis",
+  "description": "Structured extraction schema for the /analyze-paper skill covering Problem, Methods/Algorithms, Datasets, Metrics, Relational Results, and Critical Review.",
+  "type": "object",
+  "required": [
+    "metadata",
+    "problem",
+    "methods",
+    "datasets",
+    "metrics",
+    "experimental_results",
+    "critical_review"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["title", "authors", "year", "domain_tags", "tldr"],
+      "properties": {
+        "title": { "type": "string", "description": "Full title of the paper" },
+        "authors": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of authors"
+        },
+        "affiliations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Key institutions or labs"
+        },
+        "year": { "type": "string", "description": "Publication or preprint year" },
+        "venue": { "type": "string", "description": "Conference, journal, or arXiv preprint identifier" },
+        "source_url_or_path": { "type": "string", "description": "Original file path, DOI, or arXiv URL" },
+        "code_url": { "type": "string", "description": "Official GitHub/code URL if mentioned, or 'Not provided'" },
+        "domain_tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "High-level classification tags (e.g., 'Computer Vision', 'NLP', 'Reinforcement Learning')"
+        },
+        "tldr": {
+          "type": "string",
+          "description": "2-3 sentence executive summary of what the paper does and why it matters"
+        },
+        "reproducibility": {
+          "type": "object",
+          "properties": {
+            "code_available": { "type": "boolean" },
+            "public_datasets": { "type": "boolean" },
+            "hyperparameters_specified": { "type": "boolean" },
+            "compute_specified": { "type": "string", "description": "Hardware/compute details (e.g., '8x NVIDIA A100 80GB') or 'Not specified'" },
+            "reproducibility_tier": {
+              "type": "string",
+              "enum": ["High", "Medium", "Low"]
+            }
+          }
+        }
+      }
+    },
+    "problem": {
+      "type": "object",
+      "required": [
+        "broad_domain",
+        "specific_task",
+        "problem_statement",
+        "prior_bottlenecks",
+        "key_contributions",
+        "evidence_location"
+      ],
+      "properties": {
+        "broad_domain": { "type": "string", "description": "e.g., Natural Language Processing, Computer Vision, Systems, Bioinformatics" },
+        "specific_task": { "type": "string", "description": "e.g., Long-Context Question Answering, Real-Time 3D Object Detection" },
+        "problem_type_badges": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Taxonomy tags for the problem (e.g., 'Efficiency Bottleneck', 'New Benchmark/Task', 'Generalization / OOD', 'Theoretical Analysis')"
+        },
+        "problem_statement": { "type": "string", "description": "Clear formulation of the core research problem being solved" },
+        "research_questions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Explicit or implicit research questions addressed by the paper"
+        },
+        "prior_bottlenecks": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Why existing methods or baselines fail or struggle on this problem"
+        },
+        "key_contributions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Primary novel contributions claimed by the authors"
+        },
+        "evidence_location": { "type": "string", "description": "Section/page citations (e.g., 'Abstract, Section 1, pp. 1-2')" }
+      }
+    },
+    "methods": {
+      "type": "object",
+      "required": [
+        "primary_paradigm",
+        "method_summary",
+        "proposed_components",
+        "baselines_compared"
+      ],
+      "properties": {
+        "primary_paradigm": { "type": "string", "description": "e.g., Transformer / Attention, Diffusion Model, Graph Neural Network, Symbolic / Heuristic" },
+        "method_badges": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Classification tags (e.g., 'Self-Supervised', 'Zero-Shot', 'Test-Time Compute', 'Fine-Tuning / LoRA')"
+        },
+        "method_summary": { "type": "string", "description": "End-to-end overview of how the proposed approach works" },
+        "proposed_components": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "category", "role", "mechanism", "evidence_location"],
+            "properties": {
+              "name": { "type": "string", "description": "Name of the algorithm, module, loss function, or technique" },
+              "category": { "type": "string", "description": "e.g., 'Core Architecture', 'Objective / Loss Function', 'Training Strategy', 'Inference Optimization'" },
+              "is_novel": { "type": "boolean", "description": "True if proposed by this paper; false if adopted as a backbone/component" },
+              "role": { "type": "string", "description": "What problem sub-task this component addresses" },
+              "mechanism": { "type": "string", "description": "Technical explanation of how it works (including key equations or algorithmic steps)" },
+              "evidence_location": { "type": "string", "description": "Section, equation, or figure reference (e.g., 'Section 3.2, Eq. 4, Fig. 2')" }
+            }
+          }
+        },
+        "baselines_compared": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Prior algorithms/models compared against in experiments"
+        },
+        "pipeline_steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["step_number", "stage_name", "description"],
+            "properties": {
+              "step_number": { "type": "integer" },
+              "stage_name": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          },
+          "description": "Sequential workflow stages of the proposed method for visual rendering"
+        }
+      }
+    },
+    "datasets": {
+      "type": "array",
+      "description": "List of all datasets, benchmarks, or simulation environments used in the paper",
+      "items": {
+        "type": "object",
+        "required": ["name", "modality", "usage_role", "availability", "evidence_location"],
+        "properties": {
+          "name": { "type": "string", "description": "Canonical name of the dataset or benchmark" },
+          "modality": { "type": "string", "description": "e.g., 'Text / Code', 'Image / Video', 'Tabular', 'Audio', 'Graph', 'Multimodal', 'Simulation'" },
+          "usage_role": {
+            "type": "string",
+            "enum": ["Pre-training", "Fine-tuning / Training", "In-Domain Evaluation", "Zero-Shot / OOD Evaluation", "Ablation", "Newly Introduced Benchmark"],
+            "description": "How the dataset is used in this paper"
+          },
+          "scale_and_splits": { "type": "string", "description": "Sample counts, train/val/test split sizes, or resolution details" },
+          "domain": { "type": "string", "description": "Specific domain of the data (e.g., 'Medical Chest X-Rays', 'Python GitHub Issues')" },
+          "availability": {
+            "type": "string",
+            "enum": ["Public / Open", "Restricted / Credentialed", "Proprietary / Private", "Synthetic / Generated", "Unspecified"]
+          },
+          "preprocessing_or_notes": { "type": "string", "description": "Any special filtering, sub-sampling, or preprocessing applied" },
+          "evidence_location": { "type": "string", "description": "Section/table citation (e.g., 'Section 4.1, Table 1, p. 5')" }
+        }
+      }
+    },
+    "metrics": {
+      "type": "array",
+      "description": "List of all evaluation metrics and criteria used to measure performance",
+      "items": {
+        "type": "object",
+        "required": ["name", "category", "direction", "purpose", "evidence_location"],
+        "properties": {
+          "name": { "type": "string", "description": "Metric name (e.g., 'mIoU', 'Pass@1', 'FID', 'BLEU-4', 'Latency (ms)')" },
+          "category": {
+            "type": "string",
+            "enum": ["Task Accuracy / Quality", "Error / Distance", "Efficiency / Compute / Memory", "Perceptual / Human / LLM-Judge", "Robustness / Calibration", "Statistical Significance"],
+            "description": "Classification group of the metric"
+          },
+          "direction": {
+            "type": "string",
+            "enum": ["Higher is better (↑)", "Lower is better (↓)", "Target value / Neutral (↔)"]
+          },
+          "purpose": { "type": "string", "description": "What specific aspect of model behavior this metric evaluates and how it is defined" },
+          "is_primary": { "type": "boolean", "description": "True if this is a headline evaluation metric of the paper" },
+          "evidence_location": { "type": "string", "description": "Section/table citation (e.g., 'Section 4.2, Table 2')" }
+        }
+      }
+    },
+    "experimental_results": {
+      "type": "array",
+      "description": "Relational mapping linking Method + Dataset + Metric + Quantitative Score + Comparison vs. Baseline",
+      "items": {
+        "type": "object",
+        "required": ["dataset", "metric", "proposed_method_name", "proposed_score", "evidence_location"],
+        "properties": {
+          "dataset": { "type": "string" },
+          "metric": { "type": "string" },
+          "proposed_method_name": { "type": "string" },
+          "proposed_score": { "type": "string", "description": "Score achieved by the proposed method (with units/std if reported)" },
+          "best_baseline_name": { "type": "string", "description": "Strongest prior baseline on this dataset/metric" },
+          "best_baseline_score": { "type": "string", "description": "Score of the strongest prior baseline" },
+          "delta_or_improvement": { "type": "string", "description": "Relative or absolute gain (e.g., '+4.2%', '2.3x speedup')" },
+          "evidence_location": { "type": "string", "description": "Table or figure citation (e.g., 'Table 1, p. 6')" }
+        }
+      }
+    },
+    "critical_review": {
+      "type": "object",
+      "required": ["strengths", "limitations", "future_directions"],
+      "properties": {
+        "strengths": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Key technical strengths, strong ablations, or practical impact"
+        },
+        "limitations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Author-acknowledged limitations and reviewer-identified blind spots or assumptions"
+        },
+        "future_directions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Open questions and next steps suggested by the paper"
+        }
+      }
+    }
+  }
+}
+

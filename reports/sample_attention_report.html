@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attention Is All You Need — Paper Classification & Analysis Report</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    :root {
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-muted: #f1f5f9;
+      --bg-elevated: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-subtle: #64748b;
+      --border-color: #e2e8f0;
+      --accent-blue: #2563eb;
+      --accent-blue-soft: rgba(37, 99, 235, 0.12);
+      --accent-purple: #7c3aed;
+      --accent-purple-soft: rgba(124, 58, 237, 0.12);
+      --accent-emerald: #059669;
+      --accent-emerald-soft: rgba(5, 150, 105, 0.12);
+      --accent-amber: #d97706;
+      --accent-amber-soft: rgba(217, 119, 6, 0.12);
+      --accent-rose: #e11d48;
+      --accent-rose-soft: rgba(225, 29, 72, 0.12);
+      --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    html.dark {
+      --bg-page: #0b0f19;
+      --bg-card: #111827;
+      --bg-muted: #1e293b;
+      --bg-elevated: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-subtle: #64748b;
+      --border-color: #1e293b;
+      --accent-blue: #60a5fa;
+      --accent-blue-soft: rgba(96, 165, 250, 0.15);
+      --accent-purple: #a78bfa;
+      --accent-purple-soft: rgba(167, 139, 250, 0.15);
+      --accent-emerald: #34d399;
+      --accent-emerald-soft: rgba(52, 211, 153, 0.15);
+      --accent-amber: #fbbf24;
+      --accent-amber-soft: rgba(251, 191, 36, 0.15);
+      --accent-rose: #fb7185;
+      --accent-rose-soft: rgba(251, 113, 133, 0.15);
+      --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .container { max-width: 1280px; margin: 0 auto; padding: 24px; }
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 20px;
+      transition: border-color 0.2s ease, transform 0.15s ease;
+    }
+    .card:hover { border-color: var(--bg-elevated); }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    .badge-blue { background: var(--accent-blue-soft); color: var(--accent-blue); border: 1px solid rgba(96, 165, 250, 0.3); }
+    .badge-purple { background: var(--accent-purple-soft); color: var(--accent-purple); border: 1px solid rgba(167, 139, 250, 0.3); }
+    .badge-emerald { background: var(--accent-emerald-soft); color: var(--accent-emerald); border: 1px solid rgba(52, 211, 153, 0.3); }
+    .badge-amber { background: var(--accent-amber-soft); color: var(--accent-amber); border: 1px solid rgba(251, 191, 36, 0.3); }
+    .badge-rose { background: var(--accent-rose-soft); color: var(--accent-rose); border: 1px solid rgba(251, 113, 133, 0.3); }
+    .badge-muted { background: var(--bg-muted); color: var(--text-muted); border: 1px solid var(--border-color); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-main);
+      transition: all 0.15s ease;
+    }
+    .btn:hover { background: var(--bg-muted); border-color: var(--accent-blue); }
+    .btn-primary {
+      background: var(--accent-blue);
+      color: #ffffff;
+      border-color: transparent;
+    }
+    .btn-primary:hover { opacity: 0.92; background: var(--accent-blue); }
+
+    .tab-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 22px;
+      position: sticky;
+      top: 0;
+      background: var(--bg-page);
+      z-index: 20;
+      padding-top: 10px;
+    }
+    .tab-btn {
+      padding: 8px 15px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      transition: all 0.15s ease;
+    }
+    .tab-btn:hover { background: var(--bg-muted); color: var(--text-main); }
+    .tab-btn.active {
+      background: var(--accent-blue-soft);
+      color: var(--accent-blue);
+      border-color: rgba(96, 165, 250, 0.35);
+    }
+
+    .pillar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .pillar-title {
+      font-size: 17px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+    table.data-table th {
+      text-align: left;
+      padding: 11px 14px;
+      background: var(--bg-muted);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border-color);
+    }
+    table.data-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: top;
+    }
+    table.data-table tr:hover td {
+      background: rgba(148, 163, 184, 0.04);
+    }
+
+    .search-input {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      min-width: 240px;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--accent-blue); }
+
+    .pipeline-step {
+      position: relative;
+      padding: 14px 16px;
+      background: var(--bg-muted);
+      border-left: 4px solid var(--accent-purple);
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .citation-tag {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      background: var(--bg-muted);
+      padding: 2px 7px;
+      border-radius: 5px;
+      border: 1px solid var(--border-color);
+      display: inline-block;
+    }
+
+    @media print {
+      .no-print { display: none !important; }
+      .tab-section { display: block !important; }
+      body { background: #ffffff; color: #000000; }
+      .card { break-inside: avoid; box-shadow: none; border: 1px solid #cbd5e1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Top Utility Bar -->
+    <div class="no-print" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span class="badge badge-blue">/analyze-paper Report</span>
+        <span id="paper-selector-container" style="display:none;">
+          <select id="paper-selector" class="search-input" onchange="selectPaper(this.value)"></select>
+        </span>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <input type="text" id="global-search" class="search-input" placeholder="Search methods, datasets, metrics..." oninput="handleGlobalSearch(this.value)" />
+        <button class="btn" onclick="copyMarkdownSummary()" title="Copy structured Markdown summary">
+          <span id="copy-md-label">Copy Markdown</span>
+        </button>
+        <button class="btn" onclick="downloadJsonData()" title="Download extracted JSON">
+          Download JSON
+        </button>
+        <button class="btn" onclick="window.print()" title="Print or Save as PDF">
+          Print / PDF
+        </button>
+        <button class="btn" onclick="toggleTheme()" id="theme-toggle-btn">
+          Light / Dark
+        </button>
+      </div>
+    </div>
+
+    <!-- Header Card -->
+    <div class="card" id="header-card"></div>
+
+    <!-- Navigation Tabs -->
+    <div class="tab-bar no-print" id="nav-tabs">
+      <button class="tab-btn active" data-tab="all" onclick="switchTab('all')">All Sections (Dashboard)</button>
+      <button class="tab-btn" data-tab="problem" onclick="switchTab('problem')">1. Problem Solved</button>
+      <button class="tab-btn" data-tab="methods" onclick="switchTab('methods')">2. Methods & Algorithms</button>
+      <button class="tab-btn" data-tab="datasets" onclick="switchTab('datasets')">3. Datasets Used</button>
+      <button class="tab-btn" data-tab="metrics" onclick="switchTab('metrics')">4. Metrics Used</button>
+      <button class="tab-btn" data-tab="results" onclick="switchTab('results')">Results Matrix</button>
+      <button class="tab-btn" data-tab="review" onclick="switchTab('review')">Critical Review & Reproducibility</button>
+      <button class="tab-btn" data-tab="comparison" id="comparison-tab-btn" style="display:none;" onclick="switchTab('comparison')">Multi-Paper Comparison</button>
+    </div>
+
+    <!-- 4-Quadrant Quick Classification Overview -->
+    <div class="tab-section" data-section="overview">
+      <div class="grid-4" id="quadrant-overview"></div>
+    </div>
+
+    <!-- Section 1: Problem Solved -->
+    <div class="tab-section" data-section="problem" id="section-problem"></div>
+
+    <!-- Section 2: Methods & Algorithms -->
+    <div class="tab-section" data-section="methods" id="section-methods"></div>
+
+    <!-- Section 3: Datasets Used -->
+    <div class="tab-section" data-section="datasets" id="section-datasets"></div>
+
+    <!-- Section 4: Metrics Used -->
+    <div class="tab-section" data-section="metrics" id="section-metrics"></div>
+
+    <!-- Section 5: Relational Experimental Results Matrix -->
+    <div class="tab-section" data-section="results" id="section-results"></div>
+
+    <!-- Section 6: Critical Review & Reproducibility -->
+    <div class="tab-section" data-section="review" id="section-review"></div>
+
+    <!-- Section 7: Multi-Paper Comparison (shown when >1 paper is loaded) -->
+    <div class="tab-section" data-section="comparison" id="section-comparison" style="display:none;"></div>
+  </div>
+
+  <!-- Embedded Structured Data -->
+  <script id="paper-analysis-data" type="application/json">
+{
+  "metadata": {
+    "title": "Attention Is All You Need",
+    "authors": [
+      "Ashish Vaswani",
+      "Noam Shazeer",
+      "Niki Parmar",
+      "Jakob Uszkoreit",
+      "Llion Jones",
+      "Aidan N. Gomez",
+      "Łukasz Kaiser",
+      "Illia Polosukhin"
+    ],
+    "affiliations": [
+      "Google Brain",
+      "Google Research",
+      "University of Toronto"
+    ],
+    "year": "2017",
+    "venue": "NeurIPS 2017",
+    "source_url_or_path": "https://arxiv.org/abs/1706.03762",
+    "code_url": "https://github.com/tensorflow/tensor2tensor",
+    "domain_tags": [
+      "Natural Language Processing",
+      "Sequence Modeling",
+      "Deep Learning Architecture"
+    ],
+    "tldr": "Proposes the Transformer, a sequence transduction architecture based solely on self-attention mechanisms, dispensing entirely with recurrence and convolutions. It achieves state-of-the-art translation quality on WMT 2014 English-to-German and English-to-French while requiring significantly less training compute through high parallelizability.",
+    "reproducibility": {
+      "code_available": true,
+      "public_datasets": true,
+      "hyperparameters_specified": true,
+      "compute_specified": "8x NVIDIA P100 GPUs (12 hours for base model, 3.5 days for big model)",
+      "reproducibility_tier": "High"
+    }
+  },
+  "problem": {
+    "broad_domain": "Natural Language Processing (NLP)",
+    "specific_task": "Neural Machine Translation (Sequence-to-Sequence Transduction & Constituency Parsing)",
+    "problem_type_badges": [
+      "Efficiency / Latency / Memory",
+      "Accuracy / SOTA Push",
+      "Core Architecture Redesign"
+    ],
+    "problem_statement": "How can we design a sequence transduction model that captures long-range dependencies effectively while eliminating the sequential computation bottleneck of Recurrent Neural Networks (RNNs/LSTMs) and CNNs?",
+    "research_questions": [
+      "Can self-attention alone replace recurrence and convolution in encoder-decoder sequence transduction?",
+      "Does constant O(1) sequential path length improve long-range dependency modeling and training throughput?"
+    ],
+    "prior_bottlenecks": [
+      "Recurrent models (LSTM, GRU) process tokens sequentially (h_t as a function of h_{t-1}), precluding parallelization within training examples.",
+      "Convolutional sequence models (ByteNet, ConvS2S) require O(log_k(n)) or O(n/k) layers to connect distant positions, making long-range dependency learning harder."
+    ],
+    "key_contributions": [
+      "Introduces the Transformer architecture relying entirely on stacked Multi-Head Self-Attention and point-wise feed-forward layers.",
+      "Reduces maximum path length between any two input/output positions to O(1) operations.",
+      "Establishes new SOTA BLEU scores on WMT 2014 En-De (28.4) and En-Fr (41.8) at a fraction of prior training cost."
+    ],
+    "evidence_location": "Abstract, Section 1 & Section 2, pp. 1-2"
+  },
+  "methods": {
+    "primary_paradigm": "Transformer / Multi-Head Self-Attention Architecture",
+    "method_badges": [
+      "Self-Attention",
+      "Encoder-Decoder",
+      "Parallel Training",
+      "Sinusoidal Positional Encoding"
+    ],
+    "method_summary": "An encoder-decoder architecture where the encoder maps an input sequence of symbol representations to continuous representations using 6 identical layers of Multi-Head Self-Attention and position-wise FFN, and the decoder generates an output sequence auto-regressively using masked self-attention and encoder-decoder cross-attention.",
+    "proposed_components": [
+      {
+        "name": "Scaled Dot-Product Attention",
+        "category": "Core Architecture / Model Design",
+        "is_novel": true,
+        "role": "Computes weighted representation of values V based on compatibility of queries Q and keys K.",
+        "mechanism": "Computes Attention(Q, K, V) = softmax((QK^T) / sqrt(d_k))V. Scaling by 1/sqrt(d_k) prevents large dot products from pushing softmax into regions with vanishingly small gradients.",
+        "evidence_location": "Section 3.2.1, Eq. 1, Fig. 2 (left), p. 4"
+      },
+      {
+        "name": "Multi-Head Attention (MHA)",
+        "category": "Core Architecture / Model Design",
+        "is_novel": true,
+        "role": "Allows the model to jointly attend to information from different representation subspaces at different positions.",
+        "mechanism": "Projects Q, K, V h=8 times with learned linear projections to d_k=d_v=64 dimensions, applies Scaled Dot-Product Attention in parallel, concatenates outputs, and projects with W^O.",
+        "evidence_location": "Section 3.2.2, Fig. 2 (right), pp. 4-5"
+      },
+      {
+        "name": "Sinusoidal Positional Encoding",
+        "category": "Core Architecture / Model Design",
+        "is_novel": true,
+        "role": "Injects information about relative and absolute token positions since the model contains no recurrence or convolution.",
+        "mechanism": "Adds sine and cosine functions of different frequencies PE_{(pos, 2i)} = sin(pos / 10000^{2i/d_model}) to the input embeddings.",
+        "evidence_location": "Section 3.5, p. 6"
+      },
+      {
+        "name": "Warmup Inverse-Square-Root Learning Rate Schedule + Label Smoothing",
+        "category": "Training / Optimization Strategy",
+        "is_novel": false,
+        "role": "Stabilizes Adam optimizer training and prevents overconfidence during sequence generation.",
+        "mechanism": "Increases learning rate linearly for warmup_steps=4000, then decays proportionally to step_num^{-0.5}; applies label smoothing epsilon_ls=0.1.",
+        "evidence_location": "Section 5.3 & Section 5.4, pp. 7-8"
+      }
+    ],
+    "baselines_compared": [
+      "ByteNet (Kalchbrenner et al., 2016)",
+      "GNMT + RL (Wu et al., 2016)",
+      "ConvS2S (Gehring et al., 2017)",
+      "MoE (Shazeer et al., 2017)",
+      "Deep-Att + PosUnk (Zhou et al., 2016)"
+    ],
+    "pipeline_steps": [
+      {
+        "step_number": 1,
+        "stage_name": "Tokenization & Positional Embedding",
+        "description": "Tokenize source/target sentences via BPE/word-piece into d_model=512 embeddings and sum with sinusoidal positional encodings."
+      },
+      {
+        "step_number": 2,
+        "stage_name": "N=6 Encoder Stack",
+        "description": "Pass representations through 6 layers of Multi-Head Self-Attention + Residual/LayerNorm + Position-wise FFN (d_ff=2048)."
+      },
+      {
+        "step_number": 3,
+        "stage_name": "N=6 Masked Decoder Stack",
+        "description": "Apply masked self-attention over previous target tokens, cross-attention over encoder output, and position-wise FFN."
+      },
+      {
+        "step_number": 4,
+        "stage_name": "Linear Projection & Beam Search Decoding",
+        "description": "Project decoder output to vocabulary logits via shared weight matrix and decode with beam size=4, length penalty alpha=0.6."
+      }
+    ]
+  },
+  "datasets": [
+    {
+      "name": "WMT 2014 English-to-German (En-De)",
+      "modality": "Text / Natural Language",
+      "usage_role": "Fine-tuning / Training",
+      "scale_and_splits": "~4.5 million sentence pairs; encoded with Byte-Pair Encoding (BPE) shared 37,000 token vocabulary; tested on newstest2014.",
+      "domain": "Machine Translation (News / Parliamentary Text)",
+      "availability": "Public / Open",
+      "preprocessing_or_notes": "Shared source-target BPE vocabulary of 37k tokens; batched by approximate sequence length (~25,000 source + 25,000 target tokens per batch).",
+      "evidence_location": "Section 5.1, p. 7"
+    },
+    {
+      "name": "WMT 2014 English-to-French (En-Fr)",
+      "modality": "Text / Natural Language",
+      "usage_role": "Fine-tuning / Training",
+      "scale_and_splits": "36 million sentence pairs; 32,000 word-piece vocabulary; tested on newstest2014.",
+      "domain": "Machine Translation",
+      "availability": "Public / Open",
+      "preprocessing_or_notes": "Split tokens into 32,000 word-piece vocabulary.",
+      "evidence_location": "Section 5.1, p. 7"
+    },
+    {
+      "name": "Penn Treebank (WSJ Section)",
+      "modality": "Text / Natural Language",
+      "usage_role": "Zero-Shot / OOD Evaluation",
+      "scale_and_splits": "40K training sentences (WSJ only) and 17M sentences in semi-supervised setting (BerkleyParser corpora).",
+      "domain": "English Constituency Parsing",
+      "availability": "Restricted / Credentialed",
+      "preprocessing_or_notes": "Used to test whether the Transformer generalizes beyond translation to structural syntactic tasks.",
+      "evidence_location": "Section 6.3, Table 4, pp. 9-10"
+    }
+  ],
+  "metrics": [
+    {
+      "name": "BLEU (Bilingual Evaluation Understudy)",
+      "category": "Task Accuracy / Quality",
+      "direction": "Higher is better (↑)",
+      "purpose": "Measures n-gram precision overlap between generated machine translation output and human reference translations.",
+      "is_primary": true,
+      "evidence_location": "Section 6.1, Table 2, p. 8"
+    },
+    {
+      "name": "Training Cost (FLOPs)",
+      "category": "Efficiency / Compute / Memory",
+      "direction": "Lower is better (↓)",
+      "purpose": "Estimated total floating-point operations required to train the model (training time × number of GPUs × single-precision FLOP capacity).",
+      "is_primary": true,
+      "evidence_location": "Section 6.1, Table 2, p. 8"
+    },
+    {
+      "name": "Perplexity (PPL)",
+      "category": "Error / Distance",
+      "direction": "Lower is better (↓)",
+      "purpose": "Evaluates token-level language/translation modeling uncertainty on the development set (newstest2013) during ablations.",
+      "is_primary": false,
+      "evidence_location": "Section 6.2, Table 3, p. 9"
+    },
+    {
+      "name": "Section 23 F1 Score (EVALB)",
+      "category": "Task Accuracy / Quality",
+      "direction": "Higher is better (↑)",
+      "purpose": "Measures precision and recall of labeled syntactic constituents on WSJ Section 23.",
+      "is_primary": false,
+      "evidence_location": "Section 6.3, Table 4, p. 10"
+    }
+  ],
+  "experimental_results": [
+    {
+      "dataset": "WMT 2014 English-to-German (newstest2014)",
+      "metric": "BLEU",
+      "proposed_method_name": "Transformer (big)",
+      "proposed_score": "28.4",
+      "best_baseline_name": "ConvS2S Ensemble (Gehring et al., 2017)",
+      "best_baseline_score": "26.36",
+      "delta_or_improvement": "+2.04 BLEU (at ~1/40th ensemble training FLOPs)",
+      "evidence_location": "Table 2, p. 8"
+    },
+    {
+      "dataset": "WMT 2014 English-to-French (newstest2014)",
+      "metric": "BLEU",
+      "proposed_method_name": "Transformer (big)",
+      "proposed_score": "41.8",
+      "best_baseline_name": "ConvS2S (single model)",
+      "best_baseline_score": "40.46",
+      "delta_or_improvement": "+1.34 BLEU (3.5× lower training cost)",
+      "evidence_location": "Table 2, p. 8"
+    },
+    {
+      "dataset": "WSJ Constituency Parsing (Semi-Supervised)",
+      "metric": "Section 23 F1",
+      "proposed_method_name": "Transformer (4-layer)",
+      "proposed_score": "92.7",
+      "best_baseline_name": "Petrov et al. (2006) / McClosky et al. (2006)",
+      "best_baseline_score": "92.1",
+      "delta_or_improvement": "+0.6 F1",
+      "evidence_location": "Table 4, p. 10"
+    }
+  ],
+  "critical_review": {
+    "strengths": [
+      "Fundamental paradigm shift: demonstrates that self-attention alone outperforms both RNNs and CNNs on sequence transduction.",
+      "Dramatic training efficiency gains due to full parallelization across sequence positions during training.",
+      "Thorough ablation study (Table 3) isolating the impact of head count h, key dimension d_k, model size, dropout, and sinusoidal vs. learned positional embeddings."
+    ],
+    "limitations": [
+      "Quadratic O(n^2 · d) complexity per layer with respect to sequence length n, which becomes a memory/compute bottleneck for very long sequences (images, audio, video).",
+      "Autoregressive decoding during inference remains sequential O(n) steps."
+    ],
+    "future_directions": [
+      "Restricting self-attention to local neighborhoods of size r around the output position to reduce complexity to O(r · n · d) for long sequences.",
+      "Extending the Transformer architecture to multimodal inputs (images, audio, video) and less sequential generation."
+    ]
+  }
+}
+  </script>
+
+  <script>
+    const rawPayload = JSON.parse(document.getElementById('paper-analysis-data').textContent);
+    const papers = Array.isArray(rawPayload) ? rawPayload : (rawPayload.papers ? rawPayload.papers : [rawPayload]);
+    let currentPaperIndex = 0;
+    let activeTab = 'all';
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function initApp() {
+      if (papers.length > 1) {
+        const selectorContainer = document.getElementById('paper-selector-container');
+        const selector = document.getElementById('paper-selector');
+        const compTabBtn = document.getElementById('comparison-tab-btn');
+        selectorContainer.style.display = 'inline-block';
+        compTabBtn.style.display = 'inline-block';
+        selector.innerHTML = papers.map((p, idx) =>
+          `<option value="${idx}">Paper ${idx + 1}: ${escapeHtml(p.metadata?.title || 'Untitled')}</option>`
+        ).join('');
+        renderComparisonSection();
+      }
+      renderCurrentPaper();
+    }
+
+    function selectPaper(index) {
+      currentPaperIndex = parseInt(index, 10) || 0;
+      renderCurrentPaper();
+    }
+
+    function renderCurrentPaper() {
+      const data = papers[currentPaperIndex] || {};
+      const meta = data.metadata || {};
+      const prob = data.problem || {};
+      const meth = data.methods || {};
+      const dsets = Array.isArray(data.datasets) ? data.datasets : [];
+      const mets = Array.isArray(data.metrics) ? data.metrics : [];
+      const results = Array.isArray(data.experimental_results) ? data.experimental_results : [];
+      const review = data.critical_review || {};
+
+      // 1. Render Header
+      const repro = meta.reproducibility || {};
+      const reproBadgeClass = repro.reproducibility_tier === 'High' ? 'badge-emerald' :
+                              (repro.reproducibility_tier === 'Medium' ? 'badge-amber' : 'badge-rose');
+      document.getElementById('header-card').innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px;">
+          <div style="flex:1; min-width:280px;">
+            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
+              ${(meta.domain_tags || []).map(t => `<span class="badge badge-blue">${escapeHtml(t)}</span>`).join('')}
+              ${meta.year ? `<span class="badge badge-muted">${escapeHtml(meta.year)}</span>` : ''}
+              ${meta.venue ? `<span class="badge badge-purple">${escapeHtml(meta.venue)}</span>` : ''}
+              ${repro.reproducibility_tier ? `<span class="badge ${reproBadgeClass}">Reproducibility: ${escapeHtml(repro.reproducibility_tier)}</span>` : ''}
+            </div>
+            <h1 style="font-size:24px; font-weight:800; margin:0 0 8px 0; line-height:1.3;">${escapeHtml(meta.title || 'Untitled Research Paper')}</h1>
+            <div style="color:var(--text-muted); font-size:13.5px; margin-bottom:12px;">
+              <strong>Authors:</strong> ${escapeHtml((meta.authors || []).join(', ') || 'Not specified')}
+              ${(meta.affiliations && meta.affiliations.length) ? ` &bull; <span>${escapeHtml(meta.affiliations.join(', '))}</span>` : ''}
+            </div>
+            <div style="background:var(--bg-muted); border-left:4px solid var(--accent-blue); padding:12px 16px; border-radius:8px; font-size:14px;">
+              <strong>Executive Summary (TL;DR):</strong> ${escapeHtml(meta.tldr || 'No summary provided.')}
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:16px; margin-top:14px; padding-top:12px; border-top:1px solid var(--border-color); font-size:12.5px; color:var(--text-muted);">
+          <div><strong>Source:</strong> <code>${escapeHtml(meta.source_url_or_path || 'Local Input')}</code></div>
+          <div><strong>Code Repository:</strong> ${meta.code_url && meta.code_url !== 'Not provided' ? `<a href="${escapeHtml(meta.code_url)}" target="_blank" style="color:var(--accent-blue);">${escapeHtml(meta.code_url)}</a>` : 'Not provided'}</div>
+          <div><strong>Compute / Hardware:</strong> ${escapeHtml(repro.compute_specified || 'Not specified')}</div>
+        </div>
+      `;
+
+      // 2. Render 4-Quadrant Quick Summary
+      const novelCount = (meth.proposed_components || []).filter(c => c.is_novel !== false).length;
+      const primaryMetrics = mets.filter(m => m.is_primary).map(m => m.name);
+      document.getElementById('quadrant-overview').innerHTML = `
+        <div class="card" style="border-top:4px solid var(--accent-blue); cursor:pointer;" onclick="switchTab('problem')">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="badge badge-blue">1. Problem Solved</span>
+            <span class="citation-tag">${escapeHtml(prob.evidence_location || 'Sec 1')}</span>
+          </div>
+          <div style="font-weight:700; font-size:15px; margin-bottom:6px;">${escapeHtml(prob.specific_task || 'Research Task')}</div>
+          <div style="color:var(--text-muted); font-size:13px;">Domain: <strong>${escapeHtml(prob.broad_domain || 'General')}</strong></div>
+          <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:4px;">
+            ${(prob.problem_type_badges || []).map(b => `<span class="badge badge-muted">${escapeHtml(b)}</span>`).join('')}
+          </div>
+        </div>
+
+        <div class="card" style="border-top:4px solid var(--accent-purple); cursor:pointer;" onclick="switchTab('methods')">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="badge badge-purple">2. Methods & Algorithms</span>
+            <span class="badge badge-muted">${novelCount} Core Components</span>
+          </div>
+          <div style="font-weight:700; font-size:15px; margin-bottom:6px;">${escapeHtml(meth.primary_paradigm || 'Proposed Methodology')}</div>
+          <div style="color:var(--text-muted); font-size:13px;">Compared against <strong>${(meth.baselines_compared || []).length}</strong> baselines</div>
+          <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:4px;">
+            ${(meth.method_badges || []).map(b => `<span class="badge badge-muted">${escapeHtml(b)}</span>`).join('')}
+          </div>
+        </div>
+
+        <div class="card" style="border-top:4px solid var(--accent-emerald); cursor:pointer;" onclick="switchTab('datasets')">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="badge badge-emerald">3. Datasets Used</span>
+            <span class="badge badge-muted">${dsets.length} Datasets</span>
+          </div>
+          <div style="font-weight:700; font-size:15px; margin-bottom:6px;">${escapeHtml(dsets.slice(0, 3).map(d => d.name).join(', ') || 'No datasets listed')}${dsets.length > 3 ? ` +${dsets.length - 3} more` : ''}</div>
+          <div style="color:var(--text-muted); font-size:13px;">Modalities: <strong>${escapeHtml([...new Set(dsets.map(d => d.modality))].join(', ') || 'N/A')}</strong></div>
+        </div>
+
+        <div class="card" style="border-top:4px solid var(--accent-amber); cursor:pointer;" onclick="switchTab('metrics')">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="badge badge-amber">4. Evaluation Metrics</span>
+            <span class="badge badge-muted">${mets.length} Metrics</span>
+          </div>
+          <div style="font-weight:700; font-size:15px; margin-bottom:6px;">${escapeHtml((primaryMetrics.length ? primaryMetrics : mets.slice(0, 3).map(m => m.name)).join(', ') || 'No metrics listed')}</div>
+          <div style="color:var(--text-muted); font-size:13px;">${results.length} quantitative benchmark rows extracted</div>
+        </div>
+      `;
+
+      // 3. Section 1: Problem Solved
+      document.getElementById('section-problem').innerHTML = `
+        <div class="card searchable-block">
+          <div class="pillar-header">
+            <h2 class="pillar-title">
+              <span class="badge badge-blue">Group 1</span>
+              Problem Classification & Research Gap
+            </h2>
+            <span class="citation-tag">Evidence: ${escapeHtml(prob.evidence_location || 'Abstract & Introduction')}</span>
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
+            <span class="badge badge-blue">Domain: ${escapeHtml(prob.broad_domain || 'N/A')}</span>
+            <span class="badge badge-purple">Task: ${escapeHtml(prob.specific_task || 'N/A')}</span>
+            ${(prob.problem_type_badges || []).map(b => `<span class="badge badge-amber">${escapeHtml(b)}</span>`).join('')}
+          </div>
+
+          <div style="margin-bottom:18px;">
+            <h3 style="font-size:14.5px; font-weight:700; margin:0 0 6px 0;">Core Problem Statement</h3>
+            <p style="margin:0; font-size:14px;">${escapeHtml(prob.problem_statement || '')}</p>
+          </div>
+
+          ${(prob.research_questions && prob.research_questions.length) ? `
+          <div style="margin-bottom:18px;">
+            <h3 style="font-size:14.5px; font-weight:700; margin:0 0 6px 0;">Research Questions Addressed</h3>
+            <ul style="margin:0; padding-left:20px;">
+              ${prob.research_questions.map(rq => `<li style="margin-bottom:4px;">${escapeHtml(rq)}</li>`).join('')}
+            </ul>
+          </div>` : ''}
+
+          <div class="grid-2">
+            <div style="background:var(--bg-muted); padding:16px; border-radius:10px; border-left:4px solid var(--accent-rose);">
+              <h3 style="font-size:14px; font-weight:700; margin:0 0 8px 0; color:var(--accent-rose);">Prior Bottlenecks & Why Existing Methods Struggle</h3>
+              <ul style="margin:0; padding-left:18px;">
+                ${(prob.prior_bottlenecks || []).map(b => `<li style="margin-bottom:6px;">${escapeHtml(b)}</li>`).join('')}
+              </ul>
+            </div>
+            <div style="background:var(--bg-muted); padding:16px; border-radius:10px; border-left:4px solid var(--accent-emerald);">
+              <h3 style="font-size:14px; font-weight:700; margin:0 0 8px 0; color:var(--accent-emerald);">Key Contributions Claimed by This Paper</h3>
+              <ul style="margin:0; padding-left:18px;">
+                ${(prob.key_contributions || []).map(c => `<li style="margin-bottom:6px;">${escapeHtml(c)}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // 4. Section 2: Methods & Algorithms
+      const components = meth.proposed_components || [];
+      const steps = meth.pipeline_steps || [];
+      document.getElementById('section-methods').innerHTML = `
+        <div class="card searchable-block">
+          <div class="pillar-header">
+            <h2 class="pillar-title">
+              <span class="badge badge-purple">Group 2</span>
+              Methods, Architecture & Algorithms Used
+            </h2>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <span class="badge badge-purple">Paradigm: ${escapeHtml(meth.primary_paradigm || 'N/A')}</span>
+              ${(meth.method_badges || []).map(b => `<span class="badge badge-muted">${escapeHtml(b)}</span>`).join('')}
+            </div>
+          </div>
+
+          <p style="margin:0 0 18px 0; font-size:14px;">${escapeHtml(meth.method_summary || '')}</p>
+
+          ${steps.length ? `
+          <div style="margin-bottom:22px;">
+            <h3 style="font-size:14.5px; font-weight:700; margin:0 0 10px 0;">End-to-End Algorithmic Pipeline</h3>
+            <div class="grid-4">
+              ${steps.map(s => `
+                <div class="pipeline-step">
+                  <div style="font-size:12px; font-weight:700; color:var(--accent-purple); margin-bottom:4px;">STEP ${escapeHtml(s.step_number)}: ${escapeHtml(s.stage_name)}</div>
+                  <div style="font-size:13px; color:var(--text-main);">${escapeHtml(s.description)}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>` : ''}
+
+          <h3 style="font-size:14.5px; font-weight:700; margin:0 0 10px 0;">Classified Methodological Components & Algorithms</h3>
+          <div style="overflow-x:auto; margin-bottom:18px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Method / Component</th>
+                  <th>Category & Status</th>
+                  <th>Role in System</th>
+                  <th>Technical Mechanism & Formulation</th>
+                  <th>Citation</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${components.map(c => `
+                  <tr class="searchable-row">
+                    <td style="font-weight:700; min-width:160px;">${escapeHtml(c.name)}</td>
+                    <td style="min-width:150px;">
+                      <span class="badge badge-purple" style="margin-bottom:4px;">${escapeHtml(c.category)}</span><br/>
+                      <span class="badge ${c.is_novel !== false ? 'badge-emerald' : 'badge-muted'}">${c.is_novel !== false ? 'Novel Contribution' : 'Adopted / Backbone'}</span>
+                    </td>
+                    <td style="min-width:160px;">${escapeHtml(c.role)}</td>
+                    <td>${escapeHtml(c.mechanism)}</td>
+                    <td><span class="citation-tag">${escapeHtml(c.evidence_location)}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <div>
+            <h3 style="font-size:14px; font-weight:700; margin:0 0 8px 0;">Baseline Algorithms / Models Compared Against</h3>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              ${(meth.baselines_compared || []).length
+                ? meth.baselines_compared.map(b => `<span class="badge badge-muted">${escapeHtml(b)}</span>`).join('')
+                : '<span style="color:var(--text-muted);">No explicit external baselines listed</span>'}
+            </div>
+          </div>
+        </div>
+      `;
+
+      // 5. Section 3: Datasets Used
+      document.getElementById('section-datasets').innerHTML = `
+        <div class="card searchable-block">
+          <div class="pillar-header">
+            <h2 class="pillar-title">
+              <span class="badge badge-emerald">Group 3</span>
+              Datasets, Benchmarks & Environments (${dsets.length})
+            </h2>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Dataset / Benchmark</th>
+                  <th>Usage Role</th>
+                  <th>Modality & Domain</th>
+                  <th>Scale & Splits</th>
+                  <th>Availability</th>
+                  <th>Preprocessing / Notes</th>
+                  <th>Citation</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${dsets.map(d => `
+                  <tr class="searchable-row">
+                    <td style="font-weight:700; min-width:150px;">${escapeHtml(d.name)}</td>
+                    <td><span class="badge badge-emerald">${escapeHtml(d.usage_role)}</span></td>
+                    <td>
+                      <span class="badge badge-blue">${escapeHtml(d.modality)}</span>
+                      ${d.domain ? `<div style="font-size:12px; color:var(--text-muted); margin-top:4px;">${escapeHtml(d.domain)}</div>` : ''}
+                    </td>
+                    <td>${escapeHtml(d.scale_and_splits || 'Not specified')}</td>
+                    <td><span class="badge ${d.availability === 'Public / Open' ? 'badge-emerald' : 'badge-amber'}">${escapeHtml(d.availability || 'Unspecified')}</span></td>
+                    <td>${escapeHtml(d.preprocessing_or_notes || 'Standard')}</td>
+                    <td><span class="citation-tag">${escapeHtml(d.evidence_location)}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+
+      // 6. Section 4: Evaluation Metrics
+      document.getElementById('section-metrics').innerHTML = `
+        <div class="card searchable-block">
+          <div class="pillar-header">
+            <h2 class="pillar-title">
+              <span class="badge badge-amber">Group 4</span>
+              Evaluation Metrics & Criteria (${mets.length})
+            </h2>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Metric Name</th>
+                  <th>Category</th>
+                  <th>Direction</th>
+                  <th>Priority</th>
+                  <th>What It Evaluates / Definition</th>
+                  <th>Citation</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${mets.map(m => `
+                  <tr class="searchable-row">
+                    <td style="font-weight:700; min-width:140px;">${escapeHtml(m.name)}</td>
+                    <td><span class="badge badge-amber">${escapeHtml(m.category)}</span></td>
+                    <td>
+                      <span class="badge ${String(m.direction).includes('↑') ? 'badge-emerald' : (String(m.direction).includes('↓') ? 'badge-blue' : 'badge-muted')}">
+                        ${escapeHtml(m.direction)}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge ${m.is_primary ? 'badge-purple' : 'badge-muted'}">
+                        ${m.is_primary ? 'Primary Headline' : 'Secondary / Diagnostic'}
+                      </span>
+                    </td>
+                    <td>${escapeHtml(m.purpose)}</td>
+                    <td><span class="citation-tag">${escapeHtml(m.evidence_location)}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+
+      // 7. Section 5: Relational Experimental Results Matrix
+      document.getElementById('section-results').innerHTML = `
+        <div class="card searchable-block">
+          <div class="pillar-header">
+            <h2 class="pillar-title">
+              <span class="badge badge-blue">Relational Matrix</span>
+              Method &times; Dataset &times; Metric Headline Results
+            </h2>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Dataset</th>
+                  <th>Metric</th>
+                  <th>Proposed Method</th>
+                  <th>Proposed Score</th>
+                  <th>Strongest Prior Baseline</th>
+                  <th>Baseline Score</th>
+                  <th>Improvement / Delta</th>
+                  <th>Citation</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${results.map(r => `
+                  <tr class="searchable-row">
+                    <td style="font-weight:600;">${escapeHtml(r.dataset)}</td>
+                    <td><span class="badge badge-amber">${escapeHtml(r.metric)}</span></td>
+                    <td style="font-weight:700; color:var(--accent-purple);">${escapeHtml(r.proposed_method_name)}</td>
+                    <td style="font-weight:700;">${escapeHtml(r.proposed_score)}</td>
+                    <td>${escapeHtml(r.best_baseline_name || 'N/A')}</td>
+                    <td>${escapeHtml(r.best_baseline_score || 'N/A')}</td>
+                    <td><span class="badge badge-emerald">${escapeHtml(r.delta_or_improvement || 'N/A')}</span></td>
+                    <td><span class="citation-tag">${escapeHtml(r.evidence_location)}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+
+      // 8. Section 6: Critical Review & Reproducibility
+      document.getElementById('section-review').innerHTML = `
+        <div class="card searchable-block">
+          <div class="pillar-header">
+            <h2 class="pillar-title">
+              <span class="badge badge-rose">Critical Review</span>
+              Strengths, Limitations & Reproducibility Audit
+            </h2>
+          </div>
+
+          <div class="grid-2" style="margin-bottom:16px;">
+            <div style="background:var(--bg-muted); padding:16px; border-radius:10px; border-left:4px solid var(--accent-emerald);">
+              <h3 style="font-size:14px; font-weight:700; margin:0 0 8px 0; color:var(--accent-emerald);">Strengths & Technical Rigor</h3>
+              <ul style="margin:0; padding-left:18px;">
+                ${(review.strengths || []).map(s => `<li style="margin-bottom:6px;">${escapeHtml(s)}</li>`).join('')}
+              </ul>
+            </div>
+            <div style="background:var(--bg-muted); padding:16px; border-radius:10px; border-left:4px solid var(--accent-rose);">
+              <h3 style="font-size:14px; font-weight:700; margin:0 0 8px 0; color:var(--accent-rose);">Limitations, Assumptions & Failure Modes</h3>
+              <ul style="margin:0; padding-left:18px;">
+                ${(review.limitations || []).map(l => `<li style="margin-bottom:6px;">${escapeHtml(l)}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div style="background:var(--bg-muted); padding:16px; border-radius:10px; border-left:4px solid var(--accent-blue);">
+              <h3 style="font-size:14px; font-weight:700; margin:0 0 8px 0; color:var(--accent-blue);">Future Research Directions</h3>
+              <ul style="margin:0; padding-left:18px;">
+                ${(review.future_directions || []).map(f => `<li style="margin-bottom:6px;">${escapeHtml(f)}</li>`).join('')}
+              </ul>
+            </div>
+            <div style="background:var(--bg-muted); padding:16px; border-radius:10px; border-left:4px solid var(--accent-amber);">
+              <h3 style="font-size:14px; font-weight:700; margin:0 0 8px 0; color:var(--accent-amber);">Reproducibility Checklist</h3>
+              <ul style="margin:0; padding-left:18px; list-style:none;">
+                <li style="margin-bottom:6px;">${repro.code_available ? '&#9989;' : '&#10060;'} <strong>Source Code Released:</strong> ${escapeHtml(meta.code_url || 'No')}</li>
+                <li style="margin-bottom:6px;">${repro.public_datasets ? '&#9989;' : '&#10060;'} <strong>Public Benchmarks Used:</strong> ${repro.public_datasets ? 'Yes' : 'Partial / Private'}</li>
+                <li style="margin-bottom:6px;">${repro.hyperparameters_specified ? '&#9989;' : '&#10060;'} <strong>Hyperparameters Documented:</strong> ${repro.hyperparameters_specified ? 'Yes' : 'Incomplete'}</li>
+                <li style="margin-bottom:6px;"><strong>Compute Reported:</strong> ${escapeHtml(repro.compute_specified || 'Not specified')}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      `;
+
+      applyTabVisibility();
+    }
+
+    function renderComparisonSection() {
+      const container = document.getElementById('section-comparison');
+      container.innerHTML = `
+        <div class="card">
+          <div class="pillar-header">
+            <h2 class="pillar-title">
+              <span class="badge badge-blue">Multi-Paper Matrix</span>
+              Side-by-Side P-M-D-M Comparison (${papers.length} Papers)
+            </h2>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Paper (Year)</th>
+                  <th>1. Problem & Task</th>
+                  <th>2. Primary Method / Paradigm</th>
+                  <th>3. Datasets Used</th>
+                  <th>4. Primary Metrics</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${papers.map((p, idx) => `
+                  <tr>
+                    <td style="font-weight:700;">
+                      <a href="javascript:void(0)" onclick="selectPaper(${idx}); switchTab('all');" style="color:var(--accent-blue); text-decoration:none;">
+                        ${escapeHtml(p.metadata?.title || 'Untitled')}
+                      </a>
+                      <div style="font-size:12px; color:var(--text-muted);">${escapeHtml(p.metadata?.year || '')} &bull; ${escapeHtml(p.metadata?.venue || '')}</div>
+                    </td>
+                    <td>
+                      <strong>${escapeHtml(p.problem?.specific_task || '')}</strong>
+                      <div style="font-size:12.5px; color:var(--text-muted);">${escapeHtml(p.problem?.problem_statement || '')}</div>
+                    </td>
+                    <td>
+                      <span class="badge badge-purple">${escapeHtml(p.methods?.primary_paradigm || '')}</span>
+                      <div style="font-size:12.5px; margin-top:4px;">${escapeHtml((p.methods?.proposed_components || []).map(c => c.name).join(', '))}</div>
+                    </td>
+                    <td>${escapeHtml((p.datasets || []).map(d => d.name).join(', '))}</td>
+                    <td>${escapeHtml((p.metrics || []).map(m => m.name).join(', '))}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function switchTab(tab) {
+      activeTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
+      });
+      applyTabVisibility();
+    }
+
+    function applyTabVisibility() {
+      document.querySelectorAll('.tab-section').forEach(sec => {
+        const secName = sec.getAttribute('data-section');
+        if (activeTab === 'all') {
+          sec.style.display = (secName === 'comparison' && papers.length <= 1) ? 'none' : 'block';
+        } else {
+          sec.style.display = (secName === activeTab) ? 'block' : 'none';
+        }
+      });
+    }
+
+    function handleGlobalSearch(query) {
+      const q = (query || '').trim().toLowerCase();
+      document.querySelectorAll('.searchable-row').forEach(row => {
+        if (!q) {
+          row.style.display = '';
+          return;
+        }
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(q) ? '' : 'none';
+      });
+    }
+
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+    }
+
+    function downloadJsonData() {
+      const blob = new Blob([JSON.stringify(rawPayload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const titleSlug = ((papers[currentPaperIndex]?.metadata?.title) || 'paper_analysis')
+        .toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+      a.href = url;
+      a.download = `${titleSlug}_analysis.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function copyMarkdownSummary() {
+      const p = papers[currentPaperIndex] || {};
+      const md = [
+        `# ${p.metadata?.title || 'Paper Analysis'}`,
+        `- **Authors:** ${(p.metadata?.authors || []).join(', ')} (${p.metadata?.year || 'N/A'})`,
+        `- **TL;DR:** ${p.metadata?.tldr || ''}`,
+        ``,
+        `## 1. Problem Solved (${p.problem?.broad_domain || ''} -> ${p.problem?.specific_task || ''})`,
+        `${p.problem?.problem_statement || ''}`,
+        `- **Key Contributions:**`,
+        ...(p.problem?.key_contributions || []).map(c => `  - ${c}`),
+        ``,
+        `## 2. Methods & Algorithms (${p.methods?.primary_paradigm || ''})`,
+        `${p.methods?.method_summary || ''}`,
+        ...(p.methods?.proposed_components || []).map(c => `- **${c.name}** (${c.category}): ${c.mechanism} [${c.evidence_location}]`),
+        ``,
+        `## 3. Datasets Used`,
+        ...(p.datasets || []).map(d => `- **${d.name}** (${d.modality}, ${d.usage_role}): ${d.scale_and_splits || ''} [${d.evidence_location}]`),
+        ``,
+        `## 4. Evaluation Metrics`,
+        ...(p.metrics || []).map(m => `- **${m.name}** (${m.category}, ${m.direction}): ${m.purpose} [${m.evidence_location}]`)
+      ].join('\n');
+
+      navigator.clipboard.writeText(md).then(() => {
+        const lbl = document.getElementById('copy-md-label');
+        lbl.textContent = 'Copied!';
+        setTimeout(() => { lbl.textContent = 'Copy Markdown'; }, 1800);
+      });
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
